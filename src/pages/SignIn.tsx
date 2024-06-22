@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../app/store';
 import { login } from '../features/auth/authSlice';
 import { loginUser } from '../features/auth/authApi';
 import { Button, Card, CardContent, Grid, Stack, TextField, Typography } from '@mui/material';
@@ -12,6 +13,7 @@ import useNavigation from '../hooks/useNavigation';
 const SignIn: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
   useNavigation();
 
@@ -23,12 +25,17 @@ const SignIn: React.FC = () => {
     try {
       const response = await loginUser(data.email, data.password);
       dispatch(login(response.token));
-      localStorage.setItem('token', response.token);
       navigate(AppRoutes.DASHBOARD);
     } catch (error) {
       console.error('Failed to login', error);
     }
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(AppRoutes.DASHBOARD);
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <Card elevation={0} sx={{ position: 'absolute', backgroundColor: '#FEEFD9', top: 0, left: 0, right: 0, bottom: 0 }}>
