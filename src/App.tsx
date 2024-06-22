@@ -1,26 +1,21 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
-import Dashboard from './pages/Dashboard';
-import ProtectedRoute from './components/ProtectedRoutes';
-import { AppRoutes } from './constants/enum';
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import SignIn from "./pages/SignIn";
+import { AppRoutes } from "./constants/enum";
+import ProtectedRoute from "./components/ProtectedRoutes";
+import { useNavigate } from 'react-router-dom';
 
 const App: React.FC = () => {
+
+  
   return (
     <Router>
       <Routes>
         <Route path={AppRoutes.SIGNIN} element={<SignIn />} />
-        <Route path={AppRoutes.SIGNUP} element={<SignUp />} />
-        <Route path={AppRoutes.HOME} element={<SignIn />} />
-        <Route
-          path={AppRoutes.DASHBOARD}
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/" element={<ProtectedRoute />}>
+          <Route path={AppRoutes.DASHBOARD} element={<Dashboard />} />
+        </Route>
       </Routes>
     </Router>
   );

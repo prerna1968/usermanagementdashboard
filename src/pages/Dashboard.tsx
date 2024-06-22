@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import { logout } from "../features/auth/authSlice";
@@ -27,13 +27,16 @@ interface User {
 
 const Dashboard: React.FC = () => {
   const [users, setUsers] = React.useState<User[]>([]);
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const [page, setPage] = React.useState<number>(1);
+  const { isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page: number) => {
     try {
-      const res = await fetch("https://reqres.in/api/users/");
+      const res = await fetch(`https://reqres.in/api/users?page=${page}`);
       const json = await res.json();
       setUsers(json.data);
     } catch (error) {
@@ -42,12 +45,20 @@ const Dashboard: React.FC = () => {
   };
 
   React.useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers(page);
+  }, [isAuthenticated, navigate, page]);
 
   const handleLogout = () => {
     dispatch(logout());
     navigate(AppRoutes.SIGNIN);
+  };
+
+  const handleNextPage = () => {
+    setPage((prevPage) => Math.min(prevPage + 1, 2));
+  };
+
+  const handlePreviousPage = () => {
+    setPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
   if (!isAuthenticated) {
@@ -111,6 +122,18 @@ const Dashboard: React.FC = () => {
           </Box>
         )}
       </Grid>
+      <Box display="flex" justifyContent="center" marginTop={4}>
+        <Button
+          onClick={handlePreviousPage}
+          disabled={page === 1}
+          sx={{ marginRight: 2 }}
+        >
+          Previous
+        </Button>
+        <Button onClick={handleNextPage} disabled={page === 2}>
+          Next
+        </Button>
+      </Box>
     </Container>
   );
 };

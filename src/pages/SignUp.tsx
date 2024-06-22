@@ -20,7 +20,6 @@ const SignUp: React.FC = () => {
   });
 
   const onSubmit = async (data: any) => {
-    console.log(data, "signup data");
     try {
         const response = await registerUser(data.email, data.password);
         navigate(AppRoutes.SIGNIN);
